@@ -1,0 +1,91 @@
+﻿@model TransactionsViewModelWithAccountId
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a class="btn btn-primary" asp-controller="Transactions" asp-action="Create" asp-route-id="@Model.AccountId">Create a Transaction</a>
+
+</p>
+<div>
+    <input id="accountId" type="hidden" asp-for="@Model.AccountId"/>
+    <label class="form-label">Search by description</label>
+    <input type="text" id="searchInput" class="form-control" placeholder="Search by description" />
+    <button id="searchButton" class="btn btn-primary">
+        Search
+    </button>
+</div>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                <div class="" style="cursor: pointer; "  id="categoryFilter" asp-controller="transactions" asp-action="FilterByCategory">
+                    @Html.DisplayNameFor(model => model.Transaction.First().Category.Name)
+                </div>
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Transaction.First().CreatedDate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Transaction.First().Description)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Transaction.First().Type)
+            </th>
+
+            <th>
+                @Html.DisplayNameFor(model => model.Transaction.First().Amount)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Transaction.First().EndingBalance)
+            </th>
+
+            <th></th>
+        </tr>
+    </thead>
+    <tbody id="result">
+
+    </tbody>
+</table>
+<div>
+</div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script>
+    $(document).ready(function () {
+        let selectedName = ""
+        let accoundId = $('#accountId').val();
+        function filterData(name) {
+            $.ajax({
+                url: '/Transactions/FilterData',
+                type: 'GET',
+                data: { name: name, id: accoundId },
+                success: function (data) {
+                    $("#result").html(data);
+                }
+            });
+        }
+        function filterByCategory() {
+            $.ajax({
+                url: '/Transactions/FilterByCategory',
+                type: 'GET',
+                data: { id: accoundId },
+                success: function (data) {
+                    $("#result").html(data);
+                }
+            });
+        }
+        $("#searchButton").click(function () {
+            selectedName = $("#searchInput").val();
+            filterData(selectedName);
+        })
+        $("#categoryFilter").click(function () {
+            filterByCategory();
+        })
+
+        filterData("");
+    });
+</script>
